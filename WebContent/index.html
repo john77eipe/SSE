@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+	Data From Server:
+	<span id="dataFromServer"></span>
+	<br>
+	<span id="state"></span>
+	<br>
+<button onclick="start()">Start</button>
+<button onclick="stop()">Stop</button>
+<script type="text/javascript">
+	var eventSource = null;
+	
+	function start() {
+		if (!!window.EventSource) {
+			eventSource = new EventSource("SSEAsyncServlet");
+		} else {
+			// Result to xhr polling :(
+		}
+		
+		eventSource.addEventListener('message', function(event) {
+			console.log("data received: "+event.data);
+// 			console.log("data: " + event.data);
+// 			console.log("origin: " + event.origin);
+// 			console.log("lastEventId: " + event.lastEventId);
+			document.getElementById('dataFromServer').innerHTML = event.data;
+		});
+
+		// could also use this function attribute
+		// eventSource.onmessage = function(event) {..}
+
+		eventSource.addEventListener('open', function(e) {
+			console.log("connection opened event");
+		});
+
+		// could also use this function attribute
+		// eventSource.onopen = function(event) {..}
+
+		eventSource.addEventListener('error', function(e) {
+			console.log("connection error event");
+		});
+
+		// could also use this function attribute
+		// eventSource.onerror = function(event) {..}
+
+		// other than the above 3 events there are 
+		// none defined by the client though you could listen to any event defined 
+		// by the server
+
+		eventSource.addEventListener('play', function(event) {
+			console.log("play event triggered");
+			console.log("data received: "+event.data);
+		}, false);
+	}
+	function stop() {
+		console.log("connection closed event");
+		eventSource.close();
+	}
+</script>
+</body>
+</html>
